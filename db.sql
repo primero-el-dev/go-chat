@@ -1,0 +1,24 @@
+CREATE TABLE app_user (
+    id SERIAL PRIMARY KEY,
+    login VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE room (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+INSERT INTO room (name) VALUES ('first'), ('second');
+
+CREATE TABLE token (
+    id SERIAL PRIMARY KEY,
+    value VARCHAR(255) NOT NULL,
+    valid_to TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    room_id INT,
+    user_id INT,
+    CONSTRAINT fk_room FOREIGN KEY(room_id) REFERENCES room(id) ON DELETE SET NULL,
+    CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES app_user(id) ON DELETE SET NULL
+);

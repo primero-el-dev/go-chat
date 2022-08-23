@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Chat</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="../styles.css">
+    <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3 col-sm-12">
+            <h1 class="text-center">Chat</h1>
+            {{range .Rooms}}
+                <a href="/room/{{.Id}}">{{.Name}}</a>
+            {{end}}
+            <div id="rooms"></div>
+            {{.Room.Name}}
+            <div id="status"></div>
+            <div id="chat">
+                <textarea id="messages" class="form-control card-block my-3" rows="16" readonly></textarea>
+                <textarea id="textarea" name="inputMessage" class="form-control my-3" placeholder="Enter message..."></textarea>
+                <button id="send" class="btn btn-success btn-block">Send</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const input = document.querySelector('#textarea')
+        const messages = document.querySelector('#messages')
+        const send = document.querySelector('#send')
+
+        const url = "ws://" + window.location.host + "/ws/{{.Room.Id}}"
+        const ws = new WebSocket(url)
+
+        ws.onmessage = msg => {
+            const messageObj = JSON.parse(msg.data)
+            const message = `[${messageObj.login}]: ${messageObj.content}\n`
+            console.log(message)
+            messages.textContent += message
+        }
+
+        send.onclick = () => {
+            const message = {
+                token: '{{.TokenValue}}',
+                content: input.value,
+            }
+
+            ws.send(JSON.stringify(message))
+            input.value = ""
+        }
+    </script>
+</div>
+</body>
+</html>
